@@ -18,6 +18,11 @@ public:
 
 	bool loadRom(const std::vector<uint8_t> &rom);
 
+	uint8_t& operator[](uint16_t address)
+	{
+		return memory[address & 0xfff];
+	}
+
 private:
 	std::array<uint8_t, 4 * 1024> memory;
 };
