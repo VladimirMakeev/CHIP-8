@@ -1,0 +1,17 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+
+# Mac OS general
+.DS_Store
+
+# Vim swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+
+# Temporary
+*~
