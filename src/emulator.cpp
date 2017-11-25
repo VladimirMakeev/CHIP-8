@@ -6,7 +6,7 @@
 
 namespace chip8 {
 
-Emulator::Emulator()
+Emulator::Emulator() : cpu(memory)
 {
 }
 
@@ -33,6 +33,12 @@ bool Emulator::loadRom(const std::string &file)
 
 void Emulator::run()
 {
+	cpu.reset();
+
+	while (true) {
+		cpu.execute();
+		cpu.updateTimers();
+	}
 }
 
 }

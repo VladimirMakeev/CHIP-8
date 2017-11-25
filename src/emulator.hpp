@@ -3,6 +3,7 @@
 #define EMULATOR_HPP
 
 #include "memory.hpp"
+#include "cpu.hpp"
 #include <string>
 
 namespace chip8 {
@@ -17,6 +18,7 @@ public:
 
 private:
 	Memory memory;
+	CPU cpu;
 };
 
 }
