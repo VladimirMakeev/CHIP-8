@@ -92,6 +92,31 @@ private:
 	// read registers v0 through vx from memory starting at i
 	void ins_fx65(uint16_t opcode);
 	
+	uint16_t opcodeGetNNN(uint16_t opcode) const
+	{
+		return opcode & 0xfff;
+	}
+
+	uint8_t opcodeGetNN(uint16_t opcode) const
+	{
+		return opcode & 0xff;
+	}
+
+	uint8_t opcodeGetN(uint16_t opcode) const
+	{
+		return opcode & 0xf;
+	}
+
+	uint8_t opcodeGetX(uint16_t opcode) const
+	{
+		return (opcode >> 8) & 0xf;
+	}
+
+	uint8_t opcodeGetY(uint16_t opcode) const
+	{
+		return (opcode >> 4) & 0xf;
+	}
+
 
 	Memory &memory;
 
