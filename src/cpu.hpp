@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <array>
 #include <random>
+#include <unordered_map>
 
 namespace chip8 {
 
@@ -26,6 +27,11 @@ private:
 	uint8_t rand() const;
 
 	// instruction handlers
+	void ins_misc(uint16_t opcode);
+	void ins_arith(uint16_t opcode);
+	void ins_key(uint16_t opcode);
+	void ins_special(uint16_t opcode);
+
 	// jump to machine code routine at nnn
 	void ins_0nnn(uint16_t opcode);
 	// clear the display
@@ -129,6 +135,14 @@ private:
 	Memory &memory;
 	Display &display;
 	Keyboard &keyboard;
+
+	using InstructionHandler = void (CPU::*)(uint16_t);
+
+	std::array<InstructionHandler, 16> instructions;
+	// arithmetic instructions 8xy0 - 8xye
+	std::array<InstructionHandler, 9> arithmetic;
+	// special instructions fx07 - fx65
+	std::unordered_map<uint8_t, InstructionHandler> special;
 
 	std::array<uint16_t, 16> stack;
 	// general purpose registers

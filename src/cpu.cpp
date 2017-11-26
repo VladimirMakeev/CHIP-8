@@ -14,6 +14,25 @@ CPU::CPU(Memory &memory, Display &display, Keyboard &keyboard) :
 {
 	std::random_device device;
 	engine = std::mt19937(device());
+
+	instructions = {{
+		&CPU::ins_misc, &CPU::ins_1nnn, &CPU::ins_2nnn, &CPU::ins_3xnn,
+		&CPU::ins_4xnn, &CPU::ins_5xy0, &CPU::ins_6xnn, &CPU::ins_7xnn,
+		&CPU::ins_arith, &CPU::ins_9xy0, &CPU::ins_annn, &CPU::ins_bnnn,
+		&CPU::ins_cxnn, &CPU::ins_dxyn, &CPU::ins_key, &CPU::ins_special
+	}};
+
+	arithmetic = {{
+		&CPU::ins_8xy0, &CPU::ins_8xy1, &CPU::ins_8xy2, &CPU::ins_8xy3,
+		&CPU::ins_8xy4, &CPU::ins_8xy5, &CPU::ins_8xy6, &CPU::ins_8xy7,
+		&CPU::ins_8xye
+	}};
+
+	special = {
+		{0x7, &CPU::ins_fx07}, {0xa, &CPU::ins_fx0a}, {0x15, &CPU::ins_fx15},
+		{0x18, &CPU::ins_fx18}, {0x1e, &CPU::ins_fx1e}, {0x29, &CPU::ins_fx29},
+		{0x33, &CPU::ins_fx33}, {0x55, &CPU::ins_fx55}, {0x65, &CPU::ins_fx65}
+	};
 }
 
 void CPU::reset()
@@ -45,6 +64,50 @@ void CPU::updateTimers()
 uint8_t CPU::rand() const
 {
 	return dist(engine);
+}
+
+void CPU::ins_misc(uint16_t opcode)
+{
+	switch (opcodeGetNNN(opcode)) {
+	case 0x0e0:
+		ins_00e0(opcode);
+		return;
+
+	case 0x0ee:
+		ins_00ee(opcode);
+		return;
+	}
+
+	ins_0nnn(opcode);
+}
+
+void CPU::ins_arith(uint16_t opcode)
+{
+	const uint8_t nibble = opcodeGetN(opcode);
+	const uint8_t index = nibble == 0xe ? 8 : nibble;
+
+	(this->*arithmetic[index])(opcode);
+}
+
+void CPU::ins_key(uint16_t opcode)
+{
+	if (opcode & 0x1) {
+		ins_exa1(opcode);
+		return;
+	}
+
+	ins_ex9e(opcode);
+}
+
+void CPU::ins_special(uint16_t opcode)
+{
+	auto it = special.find(opcodeGetNN(opcode));
+
+	if (it != special.end()) {
+		auto handler = it->second;
+
+		(this->*handler)(opcode);
+	}
 }
 
 void CPU::ins_0nnn(uint16_t)
