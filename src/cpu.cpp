@@ -36,6 +36,7 @@ void CPU::updateTimers()
 
 void CPU::ins_0nnn(uint16_t)
 {
+	// unsupported
 }
 
 void CPU::ins_00e0(uint16_t)
@@ -44,74 +45,159 @@ void CPU::ins_00e0(uint16_t)
 
 void CPU::ins_00ee(uint16_t)
 {
+	pc = stack[sp--];
 }
 
-void CPU::ins_1nnn(uint16_t)
+void CPU::ins_1nnn(uint16_t opcode)
 {
+	pc = opcodeGetNNN(opcode);
 }
 
-void CPU::ins_2nnn(uint16_t)
+void CPU::ins_2nnn(uint16_t opcode)
 {
+	stack[++sp] = pc;
+
+	pc = opcodeGetNNN(opcode);
 }
 
-void CPU::ins_3xnn(uint16_t)
+void CPU::ins_3xnn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t nn = opcodeGetNN(opcode);
+
+	if (v[x] == nn) {
+		pc += 2;
+	}
 }
 
-void CPU::ins_4xnn(uint16_t)
+void CPU::ins_4xnn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t nn = opcodeGetNN(opcode);
+
+	if (v[x] != nn) {
+		pc += 2;
+	}
 }
 
-void CPU::ins_5xy0(uint16_t)
+void CPU::ins_5xy0(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	if (v[x] == v[y]) {
+		pc += 2;
+	}
 }
 
-void CPU::ins_6xnn(uint16_t)
+void CPU::ins_6xnn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t nn = opcodeGetNN(opcode);
+
+	v[x] = nn;
 }
 
-void CPU::ins_7xnn(uint16_t)
+void CPU::ins_7xnn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t nn = opcodeGetNN(opcode);
+
+	v[x] += nn;
 }
 
-void CPU::ins_8xy0(uint16_t)
+void CPU::ins_8xy0(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	v[x] = v[y];
 }
 
-void CPU::ins_8xy1(uint16_t)
+void CPU::ins_8xy1(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	v[x] |= v[y];
 }
 
-void CPU::ins_8xy2(uint16_t)
+void CPU::ins_8xy2(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	v[x] &= v[y];
 }
 
-void CPU::ins_8xy3(uint16_t)
+void CPU::ins_8xy3(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	v[x] ^= v[y];
 }
 
-void CPU::ins_8xy4(uint16_t)
+void CPU::ins_8xy4(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	const uint16_t sum = (uint16_t)v[x] + v[y];
+
+	v[x] = sum & 0xff;
+	// set carry
+	v[0xf] = sum > 0xff;
 }
 
-void CPU::ins_8xy5(uint16_t)
+void CPU::ins_8xy5(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	// set !borrow
+	v[0xf] = v[x] >= v[y];
+
+	v[x] -= v[y];
 }
 
-void CPU::ins_8xy6(uint16_t)
+void CPU::ins_8xy6(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	v[0xf] = v[x] & 0x1;
+
+	v[x] >>= 1;
 }
 
-void CPU::ins_8xy7(uint16_t)
+void CPU::ins_8xy7(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	// set !borrow
+	v[0xf] = v[y] >= v[x];
+
+	v[x] = v[y] - v[x];
 }
 
-void CPU::ins_8xye(uint16_t)
+void CPU::ins_8xye(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	v[0xf] = (v[x] & 0x80) != 0;
+
+	v[x] <<= 1;
 }
 
-void CPU::ins_9xy0(uint16_t)
+void CPU::ins_9xy0(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+
+	if (v[x] != v[y]) {
+		pc += 2;
+	}
 }
 
 void CPU::ins_annn(uint16_t)
