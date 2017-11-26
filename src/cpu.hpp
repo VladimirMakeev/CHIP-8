@@ -8,11 +8,12 @@
 namespace chip8 {
 
 class Memory;
+class Display;
 
 class CPU
 {
 public:
-	CPU(Memory &memory);
+	CPU(Memory &memory, Display &display);
 
 	void reset();
 	// execute single instruction
@@ -119,6 +120,7 @@ private:
 
 
 	Memory &memory;
+	Display &display;
 
 	std::array<uint16_t, 16> stack;
 	// general purpose registers

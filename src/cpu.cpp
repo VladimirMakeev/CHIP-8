@@ -1,10 +1,13 @@
 
 #include "cpu.hpp"
 #include "memory.hpp"
+#include "display.hpp"
 
 namespace chip8 {
 
-CPU::CPU(Memory &memory) : memory(memory)
+CPU::CPU(Memory &memory, Display &display) :
+	memory(memory),
+	display(display)
 {
 }
 
@@ -41,6 +44,7 @@ void CPU::ins_0nnn(uint16_t)
 
 void CPU::ins_00e0(uint16_t)
 {
+	display.clear();
 }
 
 void CPU::ins_00ee(uint16_t)

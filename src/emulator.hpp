@@ -4,6 +4,7 @@
 
 #include "memory.hpp"
 #include "cpu.hpp"
+#include "display.hpp"
 #include <string>
 
 namespace chip8 {
@@ -18,6 +19,7 @@ public:
 
 private:
 	Memory memory;
+	Display display;
 	CPU cpu;
 };
 
