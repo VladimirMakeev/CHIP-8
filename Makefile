@@ -1,5 +1,14 @@
 
 CXXFLAGS := -Wall -Werror -Wextra -pedantic -std=c++11 -O3
+LDFLAGS =
+
+UNAME := $(shell uname -s)
+
+ifeq ($(UNAME),Darwin)
+# Mac OS
+CXXFLAGS += -I/Library/Frameworks/SDL2.framework/Headers/
+LDFLAGS += -F/Library/Frameworks/ -framework SDL2
+endif
 
 SRC_DIR := src
 SRC := $(wildcard $(SRC_DIR)/*.cpp)
