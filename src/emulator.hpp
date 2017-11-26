@@ -6,11 +6,12 @@
 #include "cpu.hpp"
 #include "display.hpp"
 #include "keyboard.hpp"
+#include "sdlapp.hpp"
 #include <string>
 
 namespace chip8 {
 
-class Emulator
+class Emulator : public SDLApplication
 {
 public:
 	Emulator();
