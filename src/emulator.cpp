@@ -6,7 +6,7 @@
 
 namespace chip8 {
 
-Emulator::Emulator() : cpu(memory, display)
+Emulator::Emulator() : cpu(memory, display, keyboard)
 {
 }
 

@@ -2,13 +2,15 @@
 #include "cpu.hpp"
 #include "memory.hpp"
 #include "display.hpp"
+#include "keyboard.hpp"
 
 namespace chip8 {
 
-CPU::CPU(Memory &memory, Display &display) :
+CPU::CPU(Memory &memory, Display &display, Keyboard &keyboard) :
 	dist(0, 255),
 	memory(memory),
-	display(display)
+	display(display),
+	keyboard(keyboard)
 {
 	std::random_device device;
 	engine = std::mt19937(device());
@@ -259,12 +261,22 @@ void CPU::ins_dxyn(uint16_t opcode)
 	}
 }
 
-void CPU::ins_ex9e(uint16_t)
+void CPU::ins_ex9e(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	if (keyboard.isKeyPressed(v[x] & 0xf)) {
+		pc += 2;
+	}
 }
 
-void CPU::ins_exa1(uint16_t)
+void CPU::ins_exa1(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	if (!keyboard.isKeyPressed(v[x] & 0xf)) {
+		pc += 2;
+	}
 }
 
 void CPU::ins_fx07(uint16_t opcode)
