@@ -218,8 +218,33 @@ void CPU::ins_cxnn(uint16_t)
 {
 }
 
-void CPU::ins_dxyn(uint16_t)
+void CPU::ins_dxyn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t y = opcodeGetY(opcode);
+	const uint8_t n = opcodeGetN(opcode);
+
+	const uint8_t vx = v[x];
+	const uint8_t vy = v[y];
+
+	v[0xf] = 0;
+
+	for (uint8_t line = 0; line < n; line++) {
+		const uint8_t sprite = memory[i + line];
+
+		for (uint8_t column = 0; column < 8; column++) {
+			// pixel position on screen
+			const uint8_t px = vx + column;
+			const uint8_t py = vy + line;
+
+			const uint8_t bit = (sprite >> (7 - column)) & 0x1;
+			const uint8_t pixel = display.getPixel(px, py);
+			const uint8_t result = pixel ^ bit;
+
+			v[0xf] |= pixel & bit;
+			display.setPixel(px, py, result);
+		}
+	}
 }
 
 void CPU::ins_ex9e(uint16_t)
