@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <array>
+#include <random>
 
 namespace chip8 {
 
@@ -21,6 +22,8 @@ public:
 	void updateTimers();
 
 private:
+	uint8_t rand() const;
+
 	// instruction handlers
 	// jump to machine code routine at nnn
 	void ins_0nnn(uint16_t opcode);
@@ -118,6 +121,9 @@ private:
 		return (opcode >> 4) & 0xf;
 	}
 
+
+	mutable std::mt19937 engine;
+	mutable std::uniform_int_distribution<uint8_t> dist;
 
 	Memory &memory;
 	Display &display;

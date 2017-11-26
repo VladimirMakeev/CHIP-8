@@ -6,9 +6,12 @@
 namespace chip8 {
 
 CPU::CPU(Memory &memory, Display &display) :
+	dist(0, 255),
 	memory(memory),
 	display(display)
 {
+	std::random_device device;
+	engine = std::mt19937(device());
 }
 
 void CPU::reset()
@@ -35,6 +38,11 @@ void CPU::updateTimers()
 	if (st) {
 		st--;
 	}
+}
+
+uint8_t CPU::rand() const
+{
+	return dist(engine);
 }
 
 void CPU::ins_0nnn(uint16_t)
@@ -214,8 +222,12 @@ void CPU::ins_bnnn(uint16_t opcode)
 	pc = opcodeGetNNN(opcode) + v[0];
 }
 
-void CPU::ins_cxnn(uint16_t)
+void CPU::ins_cxnn(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t nn = opcodeGetNN(opcode);
+
+	v[x] = rand() & nn;
 }
 
 void CPU::ins_dxyn(uint16_t opcode)
