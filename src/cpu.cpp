@@ -200,12 +200,14 @@ void CPU::ins_9xy0(uint16_t opcode)
 	}
 }
 
-void CPU::ins_annn(uint16_t)
+void CPU::ins_annn(uint16_t opcode)
 {
+	i = opcodeGetNNN(opcode);
 }
 
-void CPU::ins_bnnn(uint16_t)
+void CPU::ins_bnnn(uint16_t opcode)
 {
+	pc = opcodeGetNNN(opcode) + v[0];
 }
 
 void CPU::ins_cxnn(uint16_t)
@@ -224,40 +226,71 @@ void CPU::ins_exa1(uint16_t)
 {
 }
 
-void CPU::ins_fx07(uint16_t)
+void CPU::ins_fx07(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	
+	v[x] = dt;
 }
 
 void CPU::ins_fx0a(uint16_t)
 {
 }
 
-void CPU::ins_fx15(uint16_t)
+void CPU::ins_fx15(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	dt = v[x];
 }
 
-void CPU::ins_fx18(uint16_t)
+void CPU::ins_fx18(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	st = v[x];
 }
 
-void CPU::ins_fx1e(uint16_t)
+void CPU::ins_fx1e(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	i += v[x];
 }
 
 void CPU::ins_fx29(uint16_t)
 {
 }
 
-void CPU::ins_fx33(uint16_t)
+void CPU::ins_fx33(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t vx = v[x];
+	const uint8_t hundreds = vx / 100;
+	const uint8_t tens = (vx / 10) % 10;
+	const uint8_t ones = vx % 10;
+
+	memory[i] = hundreds;
+	memory[i + 1] = tens;
+	memory[i + 2] = ones;
 }
 
-void CPU::ins_fx55(uint16_t)
+void CPU::ins_fx55(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	for (uint8_t reg = 0; reg <= x; reg++) {
+		memory[i + reg] = v[reg];
+	}
 }
 
-void CPU::ins_fx65(uint16_t)
+void CPU::ins_fx65(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+
+	for (uint8_t reg = 0; reg <= x; reg++) {
+		v[reg] = memory[i + reg];
+	}
 }
 
 }
