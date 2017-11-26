@@ -48,6 +48,10 @@ void CPU::reset()
 
 void CPU::execute()
 {
+	const uint16_t opcode = fetch();
+	const uint8_t index = (opcode >> 12) & 0xf;
+
+	(this->*instructions[index])(opcode);
 }
 
 void CPU::updateTimers()
@@ -59,6 +63,16 @@ void CPU::updateTimers()
 	if (st) {
 		st--;
 	}
+}
+
+uint16_t CPU::fetch()
+{
+	// opcodes are stored big-endian
+	const uint16_t opcode = ((uint16_t)memory[pc] << 8) | memory[pc +1];
+
+	pc += 2;
+
+	return opcode;
 }
 
 uint8_t CPU::rand() const

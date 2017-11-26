@@ -24,6 +24,7 @@ public:
 	void updateTimers();
 
 private:
+	uint16_t fetch();
 	uint8_t rand() const;
 
 	// instruction handlers
