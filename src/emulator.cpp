@@ -11,7 +11,10 @@ Emulator::Emulator() :
 	cpu(memory, display, keyboard),
 	scale(10),
 	width(Display::width()),
-	height(Display::height())
+	height(Display::height()),
+	ips(840),
+	timers_freq(60),
+	ipt(ips / timers_freq)
 {
 	window = WindowPtr(SDL_CreateWindow("CHIP-8 Emulator",
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -70,10 +73,13 @@ void Emulator::run()
 {
 	cpu.reset();
 
+	const size_t timer_delta = 1000 / timers_freq;
 	bool quit = false;
 	SDL_Event event;
 
 	while (!quit) {
+		const uint32_t ticks = SDL_GetTicks();
+
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -92,12 +98,19 @@ void Emulator::run()
 			}
 		}
 
-		cpu.execute();
 		cpu.updateTimers();
+
+		for (size_t i = 0; i < ipt; i++) {
+			cpu.execute();
+		}
 
 		render();
 
-		SDL_Delay(1);
+		const uint32_t delta = SDL_GetTicks() - ticks;
+
+		if (delta < timer_delta) {
+			SDL_Delay(timer_delta - delta);
+		}
 	}
 }
 

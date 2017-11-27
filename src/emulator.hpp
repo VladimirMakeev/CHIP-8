@@ -52,6 +52,12 @@ private:
 	const size_t scale;
 	const size_t width;
 	const size_t height;
+	// instructions per second
+	const size_t ips;
+	// timers frequency in Hz
+	const size_t timers_freq;
+	// instructions per timer update
+	const size_t ipt;
 };
 
 }
