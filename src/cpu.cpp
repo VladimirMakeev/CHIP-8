@@ -127,7 +127,7 @@ void CPU::ins_special(uint16_t opcode)
 
 void CPU::ins_0nnn(uint16_t)
 {
-	// unsupported
+	throw std::runtime_error("Opcode 0NNN is not supported");
 }
 
 void CPU::ins_00e0(uint16_t)
