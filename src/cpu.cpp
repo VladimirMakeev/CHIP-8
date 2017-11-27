@@ -3,6 +3,7 @@
 #include "memory.hpp"
 #include "display.hpp"
 #include "keyboard.hpp"
+#include <stdexcept>
 
 namespace chip8 {
 
@@ -136,6 +137,13 @@ void CPU::ins_00e0(uint16_t)
 
 void CPU::ins_00ee(uint16_t)
 {
+	if (sp == 0) {
+		throw std::runtime_error("CHIP-8 stack underflow");
+	}
+
+	// according to CHIP-8 technical reference v1.0:
+	// the interpreter sets pc to the address at the top of the stack,
+	// then subtracts 1 from sp
 	pc = stack[sp--];
 }
 
@@ -146,6 +154,13 @@ void CPU::ins_1nnn(uint16_t opcode)
 
 void CPU::ins_2nnn(uint16_t opcode)
 {
+	if (sp == stack.size() - 1) {
+		throw std::runtime_error("CHIP-8 stack overflow");
+	}
+
+	// according to CHIP-8 technical reference v1.0:
+	// the interpreter increments sp, then puts the current pc
+	// on top of the stack
 	stack[++sp] = pc;
 
 	pc = opcodeGetNNN(opcode);
