@@ -398,8 +398,12 @@ void CPU::ins_fx1e(uint16_t opcode)
 	i += v[x];
 }
 
-void CPU::ins_fx29(uint16_t)
+void CPU::ins_fx29(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const uint8_t vx = v[x] & 0xf;
+
+	i = Memory::fontStart() + vx * 5;
 }
 
 void CPU::ins_fx33(uint16_t opcode)
