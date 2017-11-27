@@ -75,8 +75,20 @@ void Emulator::run()
 
 	while (!quit) {
 		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) {
+			switch (event.type) {
+			case SDL_QUIT:
 				quit = true;
+				break;
+
+			case SDL_KEYDOWN:
+				if (event.key.keysym.sym == SDLK_ESCAPE) {
+					quit = true;
+					break;
+				}
+				// fall through
+			case SDL_KEYUP:
+				handleInput(event.key);
+				break;
 			}
 		}
 
@@ -118,6 +130,39 @@ void Emulator::updateTexture()
 	}
 
 	SDL_UnlockTexture(texture.get());
+}
+
+void Emulator::handleInput(const SDL_KeyboardEvent &event)
+{
+	// map SDL keys to CHIP-8 keys
+	static const SDL_Keycode keys[16] = {
+		SDLK_x, // 0
+		SDLK_1, // 1
+		SDLK_2, // 2
+		SDLK_3, // 3
+		SDLK_q, // 4
+		SDLK_w, // 5
+		SDLK_e, // 6
+		SDLK_a, // 7
+		SDLK_s, // 8
+		SDLK_d, // 9
+		SDLK_z, // A
+		SDLK_c, // B
+		SDLK_4, // C
+		SDLK_r, // D
+		SDLK_f, // E
+		SDLK_v  // F
+	};
+
+	const bool pressed = event.type == SDL_KEYDOWN;
+	const SDL_Keycode code = event.keysym.sym;
+
+	for (size_t i = 0; i < 16; i++) {
+		if (code == keys[i]) {
+			keyboard.setKeyPressed(i, pressed);
+			break;
+		}
+	}
 }
 
 }

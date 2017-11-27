@@ -24,6 +24,7 @@ public:
 private:
 	void render();
 	void updateTexture();
+	void handleInput(const SDL_KeyboardEvent &event);
 
 	Memory memory;
 	Display display;
