@@ -363,8 +363,18 @@ void CPU::ins_fx07(uint16_t opcode)
 	v[x] = dt;
 }
 
-void CPU::ins_fx0a(uint16_t)
+void CPU::ins_fx0a(uint16_t opcode)
 {
+	const uint8_t x = opcodeGetX(opcode);
+	const int key = keyboard.getKeyPressed();
+
+	if (key < 0) {
+		// force cpu to repeat this instruction until key pressed
+		pc -= 2;
+		return;
+	}
+
+	v[x] = (uint8_t)key & 0xf;
 }
 
 void CPU::ins_fx15(uint16_t opcode)
