@@ -23,6 +23,7 @@ public:
 
 private:
 	void render();
+	void updateTexture();
 
 	Memory memory;
 	Display display;
@@ -33,13 +34,19 @@ private:
 	{
 		void operator()(SDL_Window *w) const { SDL_DestroyWindow(w); }
 		void operator()(SDL_Renderer *r) const { SDL_DestroyRenderer(r); }
+		void operator()(SDL_Texture *t) const { SDL_DestroyTexture(t); }
+		void operator()(SDL_PixelFormat *f) const { SDL_FreeFormat(f); }
 	};
 
 	using WindowPtr = std::unique_ptr<SDL_Window, SDLDeleter>;
 	using RendererPtr = std::unique_ptr<SDL_Renderer, SDLDeleter>;
+	using TexturePtr = std::unique_ptr<SDL_Texture, SDLDeleter>;
+	using FormatPtr = std::unique_ptr<SDL_PixelFormat, SDLDeleter>;
 
 	WindowPtr window;
 	RendererPtr renderer;
+	TexturePtr texture;
+	FormatPtr format;
 
 	const size_t scale;
 	const size_t width;

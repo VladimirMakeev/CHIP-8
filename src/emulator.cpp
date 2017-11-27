@@ -28,6 +28,20 @@ Emulator::Emulator() :
 		throw std::runtime_error("Failed to create SDL renderer");
 	}
 
+	texture = TexturePtr(SDL_CreateTexture(renderer.get(),
+			SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING,
+			width, height));
+
+	if (!texture) {
+		throw std::runtime_error("Failed to create SDL texture");
+	}
+
+	format = FormatPtr(SDL_AllocFormat(SDL_PIXELFORMAT_RGB888));
+
+	if (!format) {
+		throw std::runtime_error("Failed to create SDL pixel format");
+	}
+
 	SDL_SetRenderDrawColor(renderer.get(), 0, 0, 0, 255);
 }
 
@@ -77,9 +91,33 @@ void Emulator::run()
 
 void Emulator::render()
 {
-	SDL_RenderClear(renderer.get());
+	updateTexture();
 
-	SDL_RenderPresent(renderer.get());
+	SDL_Renderer *r = renderer.get();
+
+	SDL_RenderClear(r);
+
+	SDL_RenderCopy(r, texture.get(), nullptr, nullptr);
+
+	SDL_RenderPresent(r);
+}
+
+void Emulator::updateTexture()
+{
+	uint32_t *pixels;
+	int pitch = 0;
+
+	SDL_LockTexture(texture.get(), nullptr, (void**)&pixels, &pitch);
+
+	for (size_t y = 0; y < height; y++) {
+		for (size_t x = 0; x < width; x++) {
+			const uint8_t color = display.getPixel(x, y) ? 255 : 0;
+
+			pixels[width * y + x] = SDL_MapRGB(format.get(), color, color, color);
+		}
+	}
+
+	SDL_UnlockTexture(texture.get());
 }
 
 }
