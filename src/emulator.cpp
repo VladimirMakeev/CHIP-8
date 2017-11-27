@@ -3,11 +3,32 @@
 #include <cstdint>
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 
 namespace chip8 {
 
-Emulator::Emulator() : cpu(memory, display, keyboard)
+Emulator::Emulator() :
+	cpu(memory, display, keyboard),
+	scale(10),
+	width(Display::width()),
+	height(Display::height())
 {
+	window = WindowPtr(SDL_CreateWindow("CHIP-8 Emulator",
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			width * scale, height * scale, SDL_WINDOW_SHOWN));
+
+	if (!window) {
+		throw std::runtime_error("Failed to create SDL window");
+	}
+
+	renderer = RendererPtr(SDL_CreateRenderer(window.get(), -1,
+			SDL_RENDERER_ACCELERATED));
+
+	if (!renderer) {
+		throw std::runtime_error("Failed to create SDL renderer");
+	}
+
+	SDL_SetRenderDrawColor(renderer.get(), 0, 0, 0, 255);
 }
 
 bool Emulator::loadRom(const std::string &file)
@@ -35,10 +56,30 @@ void Emulator::run()
 {
 	cpu.reset();
 
-	while (true) {
+	bool quit = false;
+	SDL_Event event;
+
+	while (!quit) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				quit = true;
+			}
+		}
+
 		cpu.execute();
 		cpu.updateTimers();
+
+		render();
+
+		SDL_Delay(1);
 	}
+}
+
+void Emulator::render()
+{
+	SDL_RenderClear(renderer.get());
+
+	SDL_RenderPresent(renderer.get());
 }
 
 }
